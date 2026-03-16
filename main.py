@@ -79,6 +79,7 @@ def finger_extended(hand, reference, mcp, tip):
 
 GESTURES = {
     "fuck you": [True, False, True, False, False],
+    "peace": [True, True, True, False, False], # TODO: remove thumb here, thumb detection just doesnt work well yet
 }
 
 
@@ -90,7 +91,7 @@ options = HandLandmarkerOptions(
 )
 
 with HandLandmarker.create_from_options(options) as landmarker:
-    cam = cv2.VideoCapture(1)
+    cam = cv2.VideoCapture(0)
 
     frame_width = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
     frame_height = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -136,7 +137,7 @@ with HandLandmarker.create_from_options(options) as landmarker:
                                3, (255, 255, 255), -1)
 
                 fingers = {
-                    "thumb": finger_extended(hand, 5, 3, 4),
+                    "thumb": finger_extended(hand, 5, 3, 4), # TODO: make thumb detection better
                     "index": finger_extended(hand, 9, 6, 8),
                     "middle": finger_extended(hand, 9, 10, 12),
                     "ring": finger_extended(hand, 9, 14, 16),
