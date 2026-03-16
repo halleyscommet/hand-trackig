@@ -95,6 +95,40 @@ def distance(landmark1, landmark2):
     )
 
 
+def vec3(a, b):
+    return (b.x - a.x, b.y - a.y, b.z - a.z)
+
+
+def norm(v):
+    return math.sqrt(v[0] ** 2 + v[1] ** 2 + v[2] ** 2)
+
+
+def unit(v):
+    n = norm(v)
+    if n == 0:
+        return (0.0, 0.0, 0.0)
+    return (v[0] / n, v[1] / n, v[2] / n)
+
+
+def dot(a, b):
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+
+
+def thumb_extended(hand):
+    thumb_seg_1 = unit(vec3(hand[2], hand[3]))
+    thumb_seg_2 = unit(vec3(hand[3], hand[4]))
+    thumb_dir = unit(vec3(hand[2], hand[4]))
+
+    palm_across = unit(vec3(hand[5], hand[17]))
+    palm_forward = unit(vec3(hand[0], hand[9]))
+
+    straight = dot(thumb_seg_1, thumb_seg_2) > 0.75
+    out_to_side = abs(dot(thumb_dir, palm_across)) > 0.45
+    not_folded_forward = abs(dot(thumb_dir, palm_forward)) < 0.75
+
+    return straight and out_to_side and not_folded_forward
+
+
 def finger_extended(hand, reference, mcp, tip):
     ref = (hand[reference].x - hand[0].x, hand[reference].y - hand[0].y)
     v = math.sqrt((ref[0] ** 2) + (ref[1] ** 2))
@@ -110,15 +144,10 @@ def finger_extended(hand, reference, mcp, tip):
 
 
 GESTURES = {
-    "peace": [
-        True,
-        True,
-        True,
-        False,
-        False,
-    ],  # TODO: remove thumb here, thumb detection just doesnt work well yet
-    "close": [True, False, False, False, False],
+    "close": [False, False, False, False, False],
     "open": [True, True, True, True, True],
+    "peace": [False, True, True, False, False],
+    "thumbs up": [True, False, False, False, False],
 }
 
 
@@ -196,9 +225,7 @@ with HandLandmarker.create_from_options(options) as landmarker:
                     )
 
                 fingers = {
-                    "thumb": finger_extended(
-                        hand, 5, 3, 4
-                    ),  # TODO: make thumb detection better
+                    "thumb": thumb_extended(hand),
                     "index": finger_extended(hand, 9, 6, 8),
                     "middle": finger_extended(hand, 9, 10, 12),
                     "ring": finger_extended(hand, 9, 14, 16),
@@ -213,7 +240,7 @@ with HandLandmarker.create_from_options(options) as landmarker:
                     fingers["pinky"],
                 ]
 
-                ison = False
+                gesture = False
 
                 for key, check in GESTURES.items():
                     if finger_states == check:
@@ -226,9 +253,9 @@ with HandLandmarker.create_from_options(options) as landmarker:
                             (255, 255, 255),
                             1,
                         )
-                        ison = True
+                        gesture = True
 
-                if not ison:
+                if not gesture:
                     cv2.putText(
                         frame,
                         "No Gesture",
