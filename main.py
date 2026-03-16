@@ -80,6 +80,8 @@ def finger_extended(hand, reference, mcp, tip):
 GESTURES = {
     "fuck you": [True, False, True, False, False],
     "peace": [True, True, True, False, False], # TODO: remove thumb here, thumb detection just doesnt work well yet
+    "fist": [True, False, False, False, False],
+    "open": [True, True, True, True, True]
 }
 
 
