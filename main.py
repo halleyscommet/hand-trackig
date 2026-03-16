@@ -224,23 +224,15 @@ with HandLandmarker.create_from_options(options) as landmarker:
                         -1,
                     )
 
-                fingers = {
-                    "thumb": thumb_extended(hand),
-                    "index": finger_extended(hand, 9, 6, 8),
-                    "middle": finger_extended(hand, 9, 10, 12),
-                    "ring": finger_extended(hand, 9, 14, 16),
-                    "pinky": finger_extended(hand, 9, 18, 20),
-                }
-
                 finger_states = [
-                    fingers["thumb"],
-                    fingers["index"],
-                    fingers["middle"],
-                    fingers["ring"],
-                    fingers["pinky"],
+                    thumb_extended(hand),
+                    finger_extended(hand, 9, 6, 8),
+                    finger_extended(hand, 9, 10, 12),
+                    finger_extended(hand, 9, 14, 16),
+                    finger_extended(hand, 9, 18, 20),
                 ]
 
-                gesture = False
+                gesture = None
 
                 for key, check in GESTURES.items():
                     if finger_states == check:
@@ -253,9 +245,9 @@ with HandLandmarker.create_from_options(options) as landmarker:
                             (255, 255, 255),
                             1,
                         )
-                        gesture = True
+                        gesture = key
 
-                if not gesture:
+                if gesture is None:
                     cv2.putText(
                         frame,
                         "No Gesture",
