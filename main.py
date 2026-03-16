@@ -3,9 +3,6 @@ import mediapipe as mp
 import time
 import math
 
-from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
-
 model_path = "hand_landmarker.task"
 
 BaseOptions = mp.tasks.BaseOptions
